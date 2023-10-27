@@ -14,7 +14,7 @@ program zkdao.aleo {
     }
 
     mapping admins: field => bool;
-    // num_admins always store at 0u8
+    // admin_struct always store at 0u8
     mapping admin_struct: u8 => Admin;
     mapping membership: field => Membership;
 
@@ -71,7 +71,7 @@ program zkdao.aleo {
     }
 
 
-    // WIP: add threshold admins approval before destructing owner
+    // Destructing owner functions
     transition destruct_owner() {
         return then finalize();
     }
@@ -91,7 +91,7 @@ program zkdao.aleo {
         });
     }
 
-    // Admin approval for destructing owner
+    // Admin approval for destructing owner functions
     transition approve_destruct() {
         let caller: field = BHP256::hash_to_field(self.caller);
         return then finalize(caller);

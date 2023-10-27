@@ -5,25 +5,25 @@ struct Membership:
     approvals as u8;
     granted as boolean;
 
+struct Admin:
+    num_admins as u8;
+    destruct_approvals as u8;
+    destructed as boolean;
+
 
 mapping admins:
 	key as field.public;
 	value as boolean.public;
 
 
-mapping num_admins:
+mapping admin_struct:
 	key as u8.public;
-	value as u8.public;
+	value as Admin.public;
 
 
 mapping membership:
 	key as field.public;
 	value as Membership.public;
-
-
-mapping destructed:
-	key as u8.public;
-	value as boolean.public;
 
 function grant_admin_initial:
     input r0 as address.private;
@@ -35,30 +35,34 @@ function grant_admin_initial:
 
 finalize grant_admin_initial:
     input r0 as field.public;
-    get.or_use destructed[0u8] false into r1;
-    assert.eq r1 false;
+    cast 0u8 0u8 false into r1 as Admin;
+    get.or_use admin_struct[0u8] r1 into r2;
+    assert.eq r2.destructed false;
     set true into admins[r0];
-    get.or_use num_admins[0u8] 0u8 into r2;
-    add r2 1u8 into r3;
-    set r3 into num_admins[0u8];
+    add r2.num_admins 1u8 into r3;
+    cast r3 r2.destruct_approvals r2.destructed into r4 as Admin;
+    set r4 into admin_struct[0u8];
 
 
 function remove_admin_initial:
     input r0 as address.private;
-    hash.keccak256 self.caller into r1 as field;
-    assert.eq r1 5902238486865207208062830792187520784062999536577299988319894300863228991622field;
-    hash.keccak256 r0 into r2 as field;
+    hash.bhp256 self.caller into r1 as field;
+    assert.eq r1 5471346192118974203811093312871574098188146069506081670514657699548656288468field;
+    hash.bhp256 r0 into r2 as field;
     async remove_admin_initial r2 into r3;
     output r3 as zkdao.aleo/remove_admin_initial.future;
 
 finalize remove_admin_initial:
     input r0 as field.public;
-    get.or_use destructed[0u8] false into r1;
-    assert.eq r1 false;
+    cast 0u8 0u8 false into r1 as Admin;
+    get.or_use admin_struct[0u8] r1 into r2;
+    assert.eq r2.destructed false;
+    gt r2.num_admins 0u8 into r3;
+    assert.eq r3 true;
     set false into admins[r0];
-    get.or_use num_admins[0u8] 0u8 into r2;
-    sub r2 1u8 into r3;
-    set r3 into num_admins[0u8];
+    sub r2.num_admins 1u8 into r4;
+    cast r4 r2.destruct_approvals r2.destructed into r5 as Admin;
+    set r5 into admin_struct[0u8];
 
 
 function destruct_owner:
@@ -66,12 +70,33 @@ function destruct_owner:
     output r0 as zkdao.aleo/destruct_owner.future;
 
 finalize destruct_owner:
-    set true into destructed[0u8];
+    cast 0u8 0u8 false into r0 as Admin;
+    get.or_use admin_struct[0u8] r0 into r1;
+    gt r1.destruct_approvals 2u8 into r2;
+    assert.eq r2 true;
+    cast r1.num_admins r1.destruct_approvals true into r3 as Admin;
+    set r3 into admin_struct[0u8];
+
+
+function approve_destruct:
+    hash.bhp256 self.caller into r0 as field;
+    async approve_destruct r0 into r1;
+    output r1 as zkdao.aleo/approve_destruct.future;
+
+finalize approve_destruct:
+    input r0 as field.public;
+    get.or_use admins[r0] false into r1;
+    assert.eq r1 true;
+    cast 0u8 0u8 false into r2 as Admin;
+    get.or_use admin_struct[0u8] r2 into r3;
+    add r3.destruct_approvals 1u8 into r4;
+    cast r3.num_admins r4 r3.destructed into r5 as Admin;
+    set r5 into admin_struct[0u8];
 
 
 function request_membership:
     input r0 as address.private;
-    hash.keccak256 r0 into r1 as field;
+    hash.bhp256 r0 into r1 as field;
     async request_membership r1 into r2;
     output r2 as zkdao.aleo/request_membership.future;
 
@@ -84,8 +109,8 @@ finalize request_membership:
 
 function approve_membership:
     input r0 as address.private;
-    hash.keccak256 r0 into r1 as field;
-    hash.keccak256 self.caller into r2 as field;
+    hash.bhp256 r0 into r1 as field;
+    hash.bhp256 self.caller into r2 as field;
     async approve_membership r2 r1 into r3;
     output r3 as zkdao.aleo/approve_membership.future;
 
@@ -102,7 +127,7 @@ finalize approve_membership:
 
 function grant_membership:
     input r0 as address.private;
-    hash.keccak256 r0 into r1 as field;
+    hash.bhp256 r0 into r1 as field;
     async grant_membership r1 into r2;
     output r2 as zkdao.aleo/grant_membership.future;
 

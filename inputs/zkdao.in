@@ -1,4 +1,19 @@
 // The program input for zkdao/src/main.leo
-[main]
-public a: u32 = 1u32;
-b: u32 = 2u32;
+[grant_admin_initial]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[remove_admin_initial]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[destruct_owner]
+
+[approve_destruct]
+
+[request_membership]
+member: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[approve_membership]
+member: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[grant_membership]
+member: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
