@@ -1,5 +1,5 @@
 // The 'zkdao' program.
-program zkdao.aleo {
+program zkdao_v0_0_1.aleo {
 
     struct Membership {
         requests: bool,
@@ -15,7 +15,7 @@ program zkdao.aleo {
     }
 
     mapping admins: field => bool;
-    // admin_struct always store at 0field
+    // admin_struct always store at 0field as global variables
     mapping admin_struct: field => Admin;
     mapping membership: field => Membership;
 
@@ -135,7 +135,11 @@ program zkdao.aleo {
     }
 
     finalize request_membership(hash: field) {
-        let temp: Membership = Mapping::get(membership, hash);
+        let temp: Membership = Mapping::get_or_use(membership, hash,  Membership {
+            requests: false,
+            approvals: 0field,
+            granted: false,
+        });
         Mapping::set(membership, hash, Membership {
             requests: true,
             approvals: temp.approvals,
