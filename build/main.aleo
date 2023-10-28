@@ -2,12 +2,12 @@ program zkdao.aleo;
 
 struct Membership:
     requests as boolean;
-    approvals as u8;
+    approvals as field;
     granted as boolean;
 
 struct Admin:
-    num_admins as u8;
-    destruct_approvals as u8;
+    num_admins as field;
+    destruct_approvals as field;
     destructed as boolean;
 
 
@@ -17,7 +17,7 @@ mapping admins:
 
 
 mapping admin_struct:
-	key as u8.public;
+	key as field.public;
 	value as Admin.public;
 
 
@@ -35,13 +35,13 @@ function grant_admin_initial:
 
 finalize grant_admin_initial:
     input r0 as field.public;
-    cast 0u8 0u8 false into r1 as Admin;
-    get.or_use admin_struct[0u8] r1 into r2;
+    cast 0field 0field false into r1 as Admin;
+    get.or_use admin_struct[0field] r1 into r2;
     assert.eq r2.destructed false;
     set true into admins[r0];
-    add r2.num_admins 1u8 into r3;
+    add r2.num_admins 1field into r3;
     cast r3 r2.destruct_approvals r2.destructed into r4 as Admin;
-    set r4 into admin_struct[0u8];
+    set r4 into admin_struct[0field];
 
 
 function remove_admin_initial:
@@ -54,15 +54,15 @@ function remove_admin_initial:
 
 finalize remove_admin_initial:
     input r0 as field.public;
-    cast 0u8 0u8 false into r1 as Admin;
-    get.or_use admin_struct[0u8] r1 into r2;
+    cast 0field 0field false into r1 as Admin;
+    get.or_use admin_struct[0field] r1 into r2;
     assert.eq r2.destructed false;
-    gt r2.num_admins 0u8 into r3;
+    gt r2.num_admins 0field into r3;
     assert.eq r3 true;
     set false into admins[r0];
-    sub r2.num_admins 1u8 into r4;
+    sub r2.num_admins 1field into r4;
     cast r4 r2.destruct_approvals r2.destructed into r5 as Admin;
-    set r5 into admin_struct[0u8];
+    set r5 into admin_struct[0field];
 
 
 function destruct_owner:
@@ -70,12 +70,12 @@ function destruct_owner:
     output r0 as zkdao.aleo/destruct_owner.future;
 
 finalize destruct_owner:
-    cast 0u8 0u8 false into r0 as Admin;
-    get.or_use admin_struct[0u8] r0 into r1;
-    gt r1.destruct_approvals 2u8 into r2;
+    cast 0field 0field false into r0 as Admin;
+    get.or_use admin_struct[0field] r0 into r1;
+    gt r1.destruct_approvals 2field into r2;
     assert.eq r2 true;
     cast r1.num_admins r1.destruct_approvals true into r3 as Admin;
-    set r3 into admin_struct[0u8];
+    set r3 into admin_struct[0field];
 
 
 function approve_destruct:
@@ -87,11 +87,11 @@ finalize approve_destruct:
     input r0 as field.public;
     get.or_use admins[r0] false into r1;
     assert.eq r1 true;
-    cast 0u8 0u8 false into r2 as Admin;
-    get.or_use admin_struct[0u8] r2 into r3;
-    add r3.destruct_approvals 1u8 into r4;
+    cast 0field 0field false into r2 as Admin;
+    get.or_use admin_struct[0field] r2 into r3;
+    add r3.destruct_approvals 1field into r4;
     cast r3.num_admins r4 r3.destructed into r5 as Admin;
-    set r5 into admin_struct[0u8];
+    set r5 into admin_struct[0field];
 
 
 function request_membership:
@@ -120,7 +120,7 @@ finalize approve_membership:
     get.or_use admins[r0] false into r2;
     assert.eq r2 true;
     get membership[r1] into r3;
-    add r3.approvals 1u8 into r4;
+    add r3.approvals 1field into r4;
     cast r3.requests r4 r3.granted into r5 as Membership;
     set r5 into membership[r1];
 
@@ -134,7 +134,7 @@ function grant_membership:
 finalize grant_membership:
     input r0 as field.public;
     get membership[r0] into r1;
-    gt r1.approvals 2u8 into r2;
+    gt r1.approvals 2field into r2;
     assert.eq r2 true;
     cast r1.requests r1.approvals true into r3 as Membership;
     set r3 into membership[r0];

@@ -3,19 +3,20 @@ program zkdao.aleo {
 
     struct Membership {
         requests: bool,
-        approvals: u8,
+        approvals: field,
         granted: bool,
     }
 
     struct Admin {
-        num_admins: u8,
-        destruct_approvals: u8,
+        num_admins: field,
+        destruct_approvals: field,
         destructed: bool,
+        reset: bool,
     }
 
     mapping admins: field => bool;
-    // admin_struct always store at 0u8
-    mapping admin_struct: u8 => Admin;
+    // admin_struct always store at 0field
+    mapping admin_struct: field => Admin;
     mapping membership: field => Membership;
 
     // Grant address admins access, program owner could be threshold signing / multisig
@@ -29,18 +30,23 @@ program zkdao.aleo {
     }
 
     finalize grant_admin_initial(hash: field) {
-        let temp: Admin = Mapping::get_or_use(admin_struct, 0u8, Admin {
-            num_admins: 0u8,
-            destruct_approvals: 0u8,
+        let temp: Admin = Mapping::get_or_use(admin_struct, 0field, Admin {
+            num_admins: 0field,
+            destruct_approvals: 0field,
             destructed: false,
+            reset: false,
         });
         assert_eq(temp.destructed, false);
 
+        let admin: bool = Mapping::get_or_use(admins, hash, false);
+        assert_eq(admin, false);
+
         Mapping::set(admins, hash, true);
-        Mapping::set(admin_struct, 0u8, Admin {
-            num_admins: temp.num_admins + 1u8,
+        Mapping::set(admin_struct, 0field, Admin {
+            num_admins: temp.num_admins + 1field,
             destruct_approvals: temp.destruct_approvals,
             destructed: temp.destructed,
+            reset: temp.reset,
         });
     }
 
@@ -54,19 +60,24 @@ program zkdao.aleo {
     }
 
     finalize remove_admin_initial(hash: field) {
-        let temp: Admin = Mapping::get_or_use(admin_struct, 0u8, Admin {
-            num_admins: 0u8,
-            destruct_approvals: 0u8,
+        let temp: Admin = Mapping::get_or_use(admin_struct, 0field, Admin {
+            num_admins: 0field,
+            destruct_approvals: 0field,
             destructed: false,
+            reset: false,
         });
         assert_eq(temp.destructed, false);
-        assert(temp.num_admins > 0u8);
+        assert(temp.num_admins > 0field);
+
+        let admin: bool = Mapping::get(admins, hash);
+        assert_eq(admin, true);
 
         Mapping::set(admins, hash, false);
-        Mapping::set(admin_struct, 0u8, Admin {
-            num_admins: temp.num_admins - 1u8,
+        Mapping::set(admin_struct, 0field, Admin {
+            num_admins: temp.num_admins - 1field,
             destruct_approvals: temp.destruct_approvals,
             destructed: temp.destructed,
+            reset: temp.reset,
         });
     }
 
@@ -77,17 +88,19 @@ program zkdao.aleo {
     }
 
     finalize destruct_owner() {
-        let temp: Admin = Mapping::get_or_use(admin_struct, 0u8, Admin {
-            num_admins: 0u8,
-            destruct_approvals: 0u8,
+        let temp: Admin = Mapping::get_or_use(admin_struct, 0field, Admin {
+            num_admins: 0field,
+            destruct_approvals: 0field,
             destructed: false,
+            reset: false,
         });
-        assert(temp.destruct_approvals > 2u8);
+        assert(temp.destruct_approvals > 2field);
 
-        Mapping::set(admin_struct, 0u8, Admin {
+        Mapping::set(admin_struct, 0field, Admin {
             num_admins: temp.num_admins,
             destruct_approvals: temp.destruct_approvals,
             destructed: true,
+            reset: temp.reset,
         });
     }
 
@@ -101,15 +114,17 @@ program zkdao.aleo {
         let has_access: bool = Mapping::get_or_use(admins, caller, false);
         assert_eq(has_access, true);
 
-        let temp: Admin = Mapping::get_or_use(admin_struct, 0u8, Admin {
-            num_admins: 0u8,
-            destruct_approvals: 0u8,
+        let temp: Admin = Mapping::get_or_use(admin_struct, 0field, Admin {
+            num_admins: 0field,
+            destruct_approvals: 0field,
             destructed: false,
+            reset: false,
         });
-        Mapping::set(admin_struct, 0u8, Admin {
+        Mapping::set(admin_struct, 0field, Admin {
             num_admins: temp.num_admins,
-            destruct_approvals: temp.destruct_approvals + 1u8,
+            destruct_approvals: temp.destruct_approvals + 1field,
             destructed: temp.destructed,
+            reset: temp.reset,
         });
     }
 
@@ -142,7 +157,7 @@ program zkdao.aleo {
         let temp: Membership = Mapping::get(membership, hash);
         Mapping::set(membership, hash, Membership {
             requests: temp.requests,
-            approvals: temp.approvals + 1u8,
+            approvals: temp.approvals + 1field,
             granted: temp.granted,
         });
     }
@@ -155,7 +170,7 @@ program zkdao.aleo {
 
     finalize grant_membership(hash: field) {
         let temp: Membership = Mapping::get(membership, hash);
-        assert(temp.approvals > 2u8);
+        assert(temp.approvals > 2field);
 
         Mapping::set(membership, hash, Membership {
             requests: temp.requests,
@@ -163,21 +178,4 @@ program zkdao.aleo {
             granted: true,
         });
     }
-
-
-    // ==================================================================Internal functions==================================================================
-    // Internal function to check is member (Not able to call finalize via function)
-    // function is_member(member: address) {
-    //     let hash: field = BHP256::hash_to_field(member);
-    //     return then finalize(hash);
-    // }
-
-    // finalize is_member(hash: field) {
-    //     let member: Membership = Mapping::get_or_use(membership, hash, Membership {
-    //         requests: false,
-    //         approvals: 0u8,
-    //         granted: false,
-    //     });
-    //     assert_eq(member.granted, true);
-    // }
 }
