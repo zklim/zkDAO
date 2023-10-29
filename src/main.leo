@@ -459,7 +459,7 @@ program zkdao_v0_0_3.aleo {
             approvals: temp.approvals + 1field,
             approved: temp.approved,
         });
-        Mapping::set(block_double_member, hash, true); // block double vote
+        Mapping::set(block_double_admin, hash, true); // block double vote
     }
 
     // Anyone can call as long proposal gain enough votes (at least 3 votes for now)
@@ -476,6 +476,7 @@ program zkdao_v0_0_3.aleo {
             approved: true,
         });
         Mapping::set(reset_member, 0field, true);
+        Mapping::set(reset_admin, 0field, true);
     }
 
     // Unblock self after action is done
