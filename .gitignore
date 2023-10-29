@@ -3,3 +3,6 @@
 *.prover
 *.verifier
 outputs/
+
+approve_member.sh
+unblock_admin.sh

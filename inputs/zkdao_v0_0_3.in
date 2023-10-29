@@ -1,0 +1,61 @@
+// The program input for zkdao/src/main.leo
+[grant_admin_initial]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[remove_admin_initial]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[request_admin]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[approve_admin]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[grant_admin]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[request_remove_admin]
+admin: field = 5471346192118974203811093312871574098188146069506081670514657699548656288468field;
+
+[approve_remove_admin]
+admin: field = 5471346192118974203811093312871574098188146069506081670514657699548656288468field;
+
+[remove_admin]
+admin: field = 5471346192118974203811093312871574098188146069506081670514657699548656288468field;
+
+[destruct_owner]
+
+[approve_destruct]
+
+[request_membership]
+member: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[approve_membership]
+member: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[grant_membership]
+member: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+// Unblock self from double approval lock
+[unblock_admin]
+admin: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+// For testing purpose only, backdoor to enable unblock double approval lock
+[backdoor_reset_admin]
+
+[propose]
+proposal: field = 1231278312field;
+
+[vote_member]
+proposal: field = 1231278312field;
+
+[vote_admin]
+proposal: field = 1231278312field;
+
+[pass_proposal]
+proposal: field = 1231278312field;
+
+[unblock_member]
+member: address = aleo1xrvvlu7g5ntxn7u4jxjrwaz833w3hjkz7gqq882a598unlk6us9sv0jf9r;
+
+[backdoor_reset_member]
