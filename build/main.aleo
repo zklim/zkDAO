@@ -1,4 +1,4 @@
-program zkdao_v0_0_2.aleo;
+program zkdao_v0_0_3.aleo;
 
 struct Membership:
     requests as boolean;
@@ -72,7 +72,7 @@ function grant_admin_initial:
     assert.eq r1 5471346192118974203811093312871574098188146069506081670514657699548656288468field;
     hash.bhp256 r0 into r2 as field;
     async grant_admin_initial r2 into r3;
-    output r3 as zkdao_v0_0_2.aleo/grant_admin_initial.future;
+    output r3 as zkdao_v0_0_3.aleo/grant_admin_initial.future;
 
 finalize grant_admin_initial:
     input r0 as field.public;
@@ -93,7 +93,7 @@ function remove_admin_initial:
     assert.eq r1 5471346192118974203811093312871574098188146069506081670514657699548656288468field;
     hash.bhp256 r0 into r2 as field;
     async remove_admin_initial r2 into r3;
-    output r3 as zkdao_v0_0_2.aleo/remove_admin_initial.future;
+    output r3 as zkdao_v0_0_3.aleo/remove_admin_initial.future;
 
 finalize remove_admin_initial:
     input r0 as field.public;
@@ -114,7 +114,7 @@ function request_admin:
     input r0 as address.private;
     hash.bhp256 r0 into r1 as field;
     async request_admin r1 into r2;
-    output r2 as zkdao_v0_0_2.aleo/request_admin.future;
+    output r2 as zkdao_v0_0_3.aleo/request_admin.future;
 
 finalize request_admin:
     input r0 as field.public;
@@ -129,7 +129,7 @@ function approve_admin:
     hash.bhp256 r0 into r1 as field;
     hash.bhp256 self.caller into r2 as field;
     async approve_admin r2 r1 into r3;
-    output r3 as zkdao_v0_0_2.aleo/approve_admin.future;
+    output r3 as zkdao_v0_0_3.aleo/approve_admin.future;
 
 finalize approve_admin:
     input r0 as field.public;
@@ -151,7 +151,7 @@ function grant_admin:
     input r0 as address.private;
     hash.bhp256 r0 into r1 as field;
     async grant_admin r1 into r2;
-    output r2 as zkdao_v0_0_2.aleo/grant_admin.future;
+    output r2 as zkdao_v0_0_3.aleo/grant_admin.future;
 
 finalize grant_admin:
     input r0 as field.public;
@@ -171,7 +171,7 @@ finalize grant_admin:
 function request_remove_admin:
     input r0 as field.private;
     async request_remove_admin r0 into r1;
-    output r1 as zkdao_v0_0_2.aleo/request_remove_admin.future;
+    output r1 as zkdao_v0_0_3.aleo/request_remove_admin.future;
 
 finalize request_remove_admin:
     input r0 as field.public;
@@ -185,7 +185,7 @@ function approve_remove_admin:
     input r0 as field.private;
     hash.bhp256 self.caller into r1 as field;
     async approve_remove_admin r1 r0 into r2;
-    output r2 as zkdao_v0_0_2.aleo/approve_remove_admin.future;
+    output r2 as zkdao_v0_0_3.aleo/approve_remove_admin.future;
 
 finalize approve_remove_admin:
     input r0 as field.public;
@@ -206,7 +206,7 @@ finalize approve_remove_admin:
 function remove_admin:
     input r0 as field.private;
     async remove_admin r0 into r1;
-    output r1 as zkdao_v0_0_2.aleo/remove_admin.future;
+    output r1 as zkdao_v0_0_3.aleo/remove_admin.future;
 
 finalize remove_admin:
     input r0 as field.public;
@@ -228,7 +228,7 @@ finalize remove_admin:
 function approve_destruct:
     hash.bhp256 self.caller into r0 as field;
     async approve_destruct r0 into r1;
-    output r1 as zkdao_v0_0_2.aleo/approve_destruct.future;
+    output r1 as zkdao_v0_0_3.aleo/approve_destruct.future;
 
 finalize approve_destruct:
     input r0 as field.public;
@@ -247,7 +247,7 @@ finalize approve_destruct:
 
 function destruct_owner:
     async destruct_owner into r0;
-    output r0 as zkdao_v0_0_2.aleo/destruct_owner.future;
+    output r0 as zkdao_v0_0_3.aleo/destruct_owner.future;
 
 finalize destruct_owner:
     get admin_global[0field] into r0;
@@ -262,7 +262,7 @@ function request_membership:
     input r0 as address.private;
     hash.bhp256 r0 into r1 as field;
     async request_membership r1 into r2;
-    output r2 as zkdao_v0_0_2.aleo/request_membership.future;
+    output r2 as zkdao_v0_0_3.aleo/request_membership.future;
 
 finalize request_membership:
     input r0 as field.public;
@@ -277,7 +277,7 @@ function approve_membership:
     hash.bhp256 r0 into r1 as field;
     hash.bhp256 self.caller into r2 as field;
     async approve_membership r2 r1 into r3;
-    output r3 as zkdao_v0_0_2.aleo/approve_membership.future;
+    output r3 as zkdao_v0_0_3.aleo/approve_membership.future;
 
 finalize approve_membership:
     input r0 as field.public;
@@ -299,7 +299,7 @@ function grant_membership:
     input r0 as address.private;
     hash.bhp256 r0 into r1 as field;
     async grant_membership r1 into r2;
-    output r2 as zkdao_v0_0_2.aleo/grant_membership.future;
+    output r2 as zkdao_v0_0_3.aleo/grant_membership.future;
 
 finalize grant_membership:
     input r0 as field.public;
@@ -315,7 +315,7 @@ function unblock_admin:
     input r0 as address.private;
     hash.bhp256 r0 into r1 as field;
     async unblock_admin r1 into r2;
-    output r2 as zkdao_v0_0_2.aleo/unblock_admin.future;
+    output r2 as zkdao_v0_0_3.aleo/unblock_admin.future;
 
 finalize unblock_admin:
     input r0 as field.public;
@@ -328,7 +328,7 @@ finalize unblock_admin:
 
 function backdoor_reset_admin:
     async backdoor_reset_admin into r0;
-    output r0 as zkdao_v0_0_2.aleo/backdoor_reset_admin.future;
+    output r0 as zkdao_v0_0_3.aleo/backdoor_reset_admin.future;
 
 finalize backdoor_reset_admin:
     set true into reset_admin[0field];
@@ -338,7 +338,7 @@ function propose:
     input r0 as field.private;
     hash.bhp256 self.caller into r1 as field;
     async propose r1 r0 into r2;
-    output r2 as zkdao_v0_0_2.aleo/propose.future;
+    output r2 as zkdao_v0_0_3.aleo/propose.future;
 
 finalize propose:
     input r0 as field.public;
@@ -353,7 +353,7 @@ function vote_member:
     input r0 as field.private;
     hash.bhp256 self.caller into r1 as field;
     async vote_member r1 r0 into r2;
-    output r2 as zkdao_v0_0_2.aleo/vote_member.future;
+    output r2 as zkdao_v0_0_3.aleo/vote_member.future;
 
 finalize vote_member:
     input r0 as field.public;
@@ -374,7 +374,7 @@ function vote_admin:
     input r0 as field.private;
     hash.bhp256 self.caller into r1 as field;
     async vote_admin r1 r0 into r2;
-    output r2 as zkdao_v0_0_2.aleo/vote_admin.future;
+    output r2 as zkdao_v0_0_3.aleo/vote_admin.future;
 
 finalize vote_admin:
     input r0 as field.public;
@@ -394,16 +394,15 @@ finalize vote_admin:
 function pass_proposal:
     input r0 as field.private;
     async pass_proposal r0 into r1;
-    output r1 as zkdao_v0_0_2.aleo/pass_proposal.future;
+    output r1 as zkdao_v0_0_3.aleo/pass_proposal.future;
 
 finalize pass_proposal:
     input r0 as field.public;
     get proposals[r0] into r1;
     gte r1.approvals 3field into r2;
     assert.eq r2 true;
-    add r1.approvals 1field into r3;
-    cast r3 r1.approved into r4 as Proposal;
-    set r4 into proposals[r0];
+    cast r1.approvals true into r3 as Proposal;
+    set r3 into proposals[r0];
     set true into reset_member[0field];
 
 
@@ -411,7 +410,7 @@ function unblock_member:
     input r0 as address.private;
     hash.bhp256 r0 into r1 as field;
     async unblock_member r1 into r2;
-    output r2 as zkdao_v0_0_2.aleo/unblock_member.future;
+    output r2 as zkdao_v0_0_3.aleo/unblock_member.future;
 
 finalize unblock_member:
     input r0 as field.public;
@@ -424,7 +423,7 @@ finalize unblock_member:
 
 function backdoor_reset_member:
     async backdoor_reset_member into r0;
-    output r0 as zkdao_v0_0_2.aleo/backdoor_reset_member.future;
+    output r0 as zkdao_v0_0_3.aleo/backdoor_reset_member.future;
 
 finalize backdoor_reset_member:
     set true into reset_member[0field];

@@ -1,5 +1,5 @@
 // The 'zkdao' program.
-program zkdao_v0_0_2.aleo {
+program zkdao_v0_0_3.aleo {
 
     // Current double approval blocking mechanism is not perfect
     // Every action shares the same double approval lock thus every single actions must be sequencial for now (request -> approve -> grant)
@@ -194,7 +194,7 @@ program zkdao_v0_0_2.aleo {
     }
 
     finalize request_remove_admin(hash: field) {
-        let request: Admin = Mapping::get_or_use(admin_req, hash,  Admin {
+        let request: Admin = Mapping::get_or_use(admin_req, hash, Admin {
             requests: false,
             approvals: 0field,
             remove_requests: false,
@@ -472,8 +472,8 @@ program zkdao_v0_0_2.aleo {
         assert(temp.approvals >= MIN_VOTES);
 
         Mapping::set(proposals, proposal, Proposal {
-            approvals: temp.approvals + 1field,
-            approved: temp.approved,
+            approvals: temp.approvals,
+            approved: true,
         });
         Mapping::set(reset_member, 0field, true);
     }
