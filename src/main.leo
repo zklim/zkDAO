@@ -1,9 +1,9 @@
 // The 'zkdao' program.
-program zkdao_v0_0_1.aleo {
+program zkdao_v0_0_2.aleo {
 
     // Current double approval blocking mechanism is not perfect
     // Every action shares the same double approval lock thus every single actions must be sequencial for now (request -> approve -> grant)
-    // IMPORTANT: Admins must unblock themselves before approving new action to avoiding bricking their admin access
+    // IMPORTANT: Admins and members must unblock themselves before approving new action to avoiding bricking their privileged access
 
     struct Membership {
         requests: bool,
@@ -25,16 +25,29 @@ program zkdao_v0_0_1.aleo {
         destructed: bool,
     }
 
-    // admins access, hashed address as key
-    mapping admins: field => bool;
+    struct Proposal {
+        approvals: field,
+        approved: bool,
+    }
+
+    const MIN_VOTES: field = 3field;
+
     // prevent double approval from same admin, always store at 0field as global variable
-    mapping block_double: field => bool;
+    mapping block_double_admin: field => bool;
     // unblock from double approval guard, always store at 0field as global variable
-    mapping reset: field => bool;
+    mapping reset_admin: field => bool;
+    // prevent double approval from same member, always store at 0field as global variable
+    mapping block_double_member: field => bool;
+    // unblock from double approval guard, always store at 0field as global variable
+    mapping reset_member: field => bool;
     // admin_global always store at 0field as global variables
     mapping admin_global: field => AdminGlobal;
+
+    // admins access, hashed address as key
+    mapping admins: field => bool;
     mapping admin_req: field => Admin;
     mapping membership: field => Membership;
+    mapping proposals: field => Proposal;
 
     // Grant address admins access by owner, program owner could be threshold signing / multisig
     // Precompute hash of owner instead of plain address
@@ -127,10 +140,10 @@ program zkdao_v0_0_1.aleo {
     }
 
     finalize approve_admin(caller: field, hash: field) {
-        Mapping::set(reset, 0field, false); // disable unblock function until action is finished
+        Mapping::set(reset_admin, 0field, false); // disable unblock function until action is finished
 
         let is_admin: bool = Mapping::get(admins, caller);
-        let is_blocked: bool = Mapping::get_or_use(block_double, caller, false);
+        let is_blocked: bool = Mapping::get_or_use(block_double_admin, caller, false);
         assert_eq(is_admin, true); // caller is admin
         assert_eq(is_blocked, false); // is not blocked
 
@@ -144,7 +157,7 @@ program zkdao_v0_0_1.aleo {
             remove_approvals: request.remove_approvals,
             granted: request.granted,
         });
-        Mapping::set(block_double, caller, true);
+        Mapping::set(block_double_admin, caller, true);
     }
 
    // Grant admin, anyone can call this function but need to meet approvals threshold to be success. For now is >= 3
@@ -155,7 +168,7 @@ program zkdao_v0_0_1.aleo {
 
     finalize grant_admin(hash: field) {
         let temp: Admin = Mapping::get(admin_req, hash);
-        assert(temp.approvals > 2field);
+        assert(temp.approvals >= MIN_VOTES);
 
         Mapping::set(admin_req, hash, Admin {
             requests: false,
@@ -172,13 +185,12 @@ program zkdao_v0_0_1.aleo {
             destruct_approvals: global.destruct_approvals,
             destructed: global.destructed,
         });
-        Mapping::set(reset, 0field, true); // enable unblock self
+        Mapping::set(reset_admin, 0field, true); // enable unblock self
     }
 
     // Request to remove admin
-    transition request_remove_admin(admin: address) {
-        let hash: field = BHP256::hash_to_field(admin);
-        return then finalize(hash);
+    transition request_remove_admin(admin: field) {
+        return then finalize(admin);
     }
 
     finalize request_remove_admin(hash: field) {
@@ -206,10 +218,10 @@ program zkdao_v0_0_1.aleo {
     }
 
     finalize approve_remove_admin(caller: field, admin: field) {
-        Mapping::set(reset, 0field, false); // disable unblock function until action is finished
+        Mapping::set(reset_admin, 0field, false); // disable unblock function until action is finished
 
         let is_admin: bool = Mapping::get(admins, caller);
-        let is_blocked: bool = Mapping::get_or_use(block_double, caller, false);
+        let is_blocked: bool = Mapping::get_or_use(block_double_admin, caller, false);
         assert_eq(is_admin, true); // caller is admin
         assert_eq(is_blocked, false); // is not blocked
 
@@ -223,7 +235,7 @@ program zkdao_v0_0_1.aleo {
             remove_approvals: request.remove_approvals + 1field,
             granted: request.granted,
         });
-        Mapping::set(block_double, caller, true); // prevent double approval
+        Mapping::set(block_double_admin, caller, true); // prevent double approval
     }
 
    // Remove admin, anyone can call this function but need to meet approvals threshold to be success. For now is >= 3
@@ -234,7 +246,7 @@ program zkdao_v0_0_1.aleo {
 
     finalize remove_admin(hash: field) {
         let temp: Admin = Mapping::get(admin_req, hash);
-        assert(temp.remove_approvals > 2field);
+        assert(temp.remove_approvals >= MIN_VOTES);
 
         Mapping::set(admin_req, hash, Admin {
             requests: false,
@@ -253,7 +265,7 @@ program zkdao_v0_0_1.aleo {
             destruct_approvals: global.destruct_approvals,
             destructed: global.destructed,
         });
-        Mapping::set(reset, 0field, true); // enable unblock self
+        Mapping::set(reset_admin, 0field, true); // enable unblock self
     }
 
     // IMPORTANT: make sure every admin unblock himself before approving new request
@@ -264,10 +276,10 @@ program zkdao_v0_0_1.aleo {
     }
 
     finalize approve_destruct(caller: field) {
-        Mapping::set(reset, 0field, false); // disable unblock function until action is finished
+        Mapping::set(reset_admin, 0field, false); // disable unblock function until action is finished
 
         let is_admin: bool = Mapping::get(admins, caller);
-        let is_blocked: bool = Mapping::get_or_use(block_double, caller, false);
+        let is_blocked: bool = Mapping::get_or_use(block_double_admin, caller, false);
         assert_eq(is_admin, true); // caller is admin
         assert_eq(is_blocked, false); // is not blocked
 
@@ -279,7 +291,7 @@ program zkdao_v0_0_1.aleo {
             destruct_approvals: temp.destruct_approvals + 1field,
             destructed: temp.destructed,
         });
-        Mapping::set(block_double, caller, true);
+        Mapping::set(block_double_admin, caller, true);
     }
 
     // Destructing owner functions
@@ -289,14 +301,14 @@ program zkdao_v0_0_1.aleo {
 
     finalize destruct_owner() {
         let temp: AdminGlobal = Mapping::get(admin_global, 0field);
-        assert(temp.destruct_approvals > 2field);
+        assert(temp.destruct_approvals >= MIN_VOTES);
 
         Mapping::set(admin_global, 0field, AdminGlobal {
             num_admins: temp.num_admins,
             destruct_approvals: temp.destruct_approvals,
             destructed: true,
         });
-        Mapping::set(reset, 0field, true); // enable unblock self
+        Mapping::set(reset_admin, 0field, true); // enable unblock self
     }
     
     // Request to join member
@@ -327,10 +339,10 @@ program zkdao_v0_0_1.aleo {
     }
 
     finalize approve_membership(caller: field, hash: field) {
-        Mapping::set(reset, 0field, false); // disable unblock function until action is finished
+        Mapping::set(reset_admin, 0field, false); // disable unblock function until action is finished
 
         let is_admin: bool = Mapping::get(admins, caller);
-        let is_blocked: bool = Mapping::get_or_use(block_double, caller, false);
+        let is_blocked: bool = Mapping::get_or_use(block_double_admin, caller, false);
         assert_eq(is_admin, true); // caller is admin
         assert_eq(is_blocked, false); // is not blocked
 
@@ -342,7 +354,7 @@ program zkdao_v0_0_1.aleo {
             approvals: temp.approvals + 1field,
             granted: temp.granted,
         });
-        Mapping::set(block_double, caller, true);
+        Mapping::set(block_double_admin, caller, true);
     }
 
     // Grant membership, anyone can call this function but need to meet approvals threshold to be success. For now is >= 3
@@ -353,38 +365,141 @@ program zkdao_v0_0_1.aleo {
 
     finalize grant_membership(hash: field) {
         let temp: Membership = Mapping::get(membership, hash);
-        assert(temp.approvals > 2field);
+        assert(temp.approvals >= MIN_VOTES);
 
         Mapping::set(membership, hash, Membership {
             requests: false,
             approvals: 0field,
             granted: true,
         });                                // clear data struct and grant membership
-        Mapping::set(reset, 0field, true); // enable unblock self
+        Mapping::set(reset_admin, 0field, true); // enable unblock self
     }
 
     // Unblock self after action is done
-    transition unblock(admin: address) {
+    transition unblock_admin(admin: address) {
         let hash: field = BHP256::hash_to_field(admin);
         return then finalize(hash);
     }
 
-    finalize unblock(hash: field) {
-        let is_blocked: bool = Mapping::get(block_double, hash);
+    finalize unblock_admin(hash: field) {
+        let is_blocked: bool = Mapping::get(block_double_admin, hash);
         assert_eq(is_blocked, true);
 
-        let enabled: bool = Mapping::get(reset, 0field);
+        let enabled: bool = Mapping::get(reset_admin, 0field);
         assert_eq(enabled, true);
 
-        Mapping::set(block_double, hash, false);
+        Mapping::set(block_double_admin, hash, false);
     }
 
     // IMPORTANT: Backdoor to unbrick admin access, for testing purpose
-    transition backdoor_reset() {
+    transition backdoor_reset_admin() {
         return then finalize();
     }
 
-    finalize backdoor_reset() {
-        Mapping::set(reset, 0field, true);
+    finalize backdoor_reset_admin() {
+        Mapping::set(reset_admin, 0field, true);
+    }
+
+    // ========================================================================Member functions========================================================================
+    // Make proposal, hashed proposal as checksum to real proposal
+    transition propose(proposal: field) {
+        let hash: field = BHP256::hash_to_field(self.caller);
+        return then finalize(hash, proposal);
+    }
+
+    finalize propose(hash: field, proposal: field) {
+        let is_member: Membership = Mapping::get(membership, hash);
+        assert_eq(is_member.granted, true);
+
+        Mapping::set(proposals, proposal, Proposal {
+            approvals: 0field,
+            approved: false,
+        });
+    }
+
+    // Approve proposal by members
+    transition vote_member(proposal: field) {
+        let hash: field = BHP256::hash_to_field(self.caller);
+        return then finalize(hash, proposal);
+    }
+
+    finalize vote_member(hash: field, proposal: field) {
+        Mapping::set(reset_member, 0field, false); // blocking reset function until action ends
+
+        let is_member: Membership = Mapping::get(membership, hash);
+        let is_blocked: bool = Mapping::get_or_use(block_double_member, hash, false);
+        assert_eq(is_member.granted, true);
+        assert_eq(is_blocked, false);
+
+        let temp: Proposal = Mapping::get(proposals, proposal);
+        Mapping::set(proposals, proposal, Proposal {
+            approvals: temp.approvals + 1field,
+            approved: temp.approved,
+        });
+        Mapping::set(block_double_member, hash, true); // block double vote
+    }
+
+
+    // Admin is automatically a member
+    transition vote_admin(proposal: field) {
+        let hash: field = BHP256::hash_to_field(self.caller);
+        return then finalize(hash, proposal);
+    }
+
+    finalize vote_admin(hash: field, proposal: field) {
+        Mapping::set(reset_member, 0field, false); // blocking reset function until action ends
+
+        let is_admin: bool = Mapping::get(admins, hash);
+        let is_blocked: bool = Mapping::get_or_use(block_double_member, hash, false);
+        assert_eq(is_admin, true);
+        assert_eq(is_blocked, false);
+
+        let temp: Proposal = Mapping::get(proposals, proposal);
+        Mapping::set(proposals, proposal, Proposal {
+            approvals: temp.approvals + 1field,
+            approved: temp.approved,
+        });
+        Mapping::set(block_double_member, hash, true); // block double vote
+    }
+
+    // Anyone can call as long proposal gain enough votes (at least 3 votes for now)
+    transition pass_proposal(proposal: field) {
+        return then finalize(proposal);
+    }
+
+    finalize pass_proposal(proposal: field) {
+        let temp: Proposal = Mapping::get(proposals, proposal);
+        assert(temp.approvals >= MIN_VOTES);
+
+        Mapping::set(proposals, proposal, Proposal {
+            approvals: temp.approvals + 1field,
+            approved: temp.approved,
+        });
+        Mapping::set(reset_member, 0field, true);
+    }
+
+    // Unblock self after action is done
+    transition unblock_member(member: address) {
+        let hash: field = BHP256::hash_to_field(member);
+        return then finalize(hash);
+    }
+
+    finalize unblock_member(hash: field) {
+        let is_blocked: bool = Mapping::get(block_double_member, hash);
+        assert_eq(is_blocked, true);
+
+        let enabled: bool = Mapping::get(reset_member, 0field);
+        assert_eq(enabled, true);
+
+        Mapping::set(block_double_member, hash, false);
+    }
+
+    // IMPORTANT: Backdoor to unbrick member access, for testing purpose
+    transition backdoor_reset_member() {
+        return then finalize();
+    }
+
+    finalize backdoor_reset_member() {
+        Mapping::set(reset_member, 0field, true);
     }
 }
