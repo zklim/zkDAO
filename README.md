@@ -1,4 +1,17 @@
-# zkdao.aleo
+# Idea
+The primary goal of ZK DAO is to provide users of the Aleo blockchain with a means of voting on proposals and/or participating in collective asset ownership with complete privacy, i.e. no need to expose account addresses, etc.
+
+# Problem
+Publicly accessible records of membership and voting history in a DAO, especially on transparent platforms like the Ethereum blockchain, can lead to potential privacy breaches and may expose members to undue influence, targeted lobbying, or even retaliatory actions based on their past decisions.
+
+# Solution
+ZK DAO aims to add a layer of privacy to the common UX features of a DAO, namely by providing private (but verifiable) membership, voting and asset ownership. As such, many of the above-listed concerns will be addressed by not being able to tie DAO activity with a public account address.
+
+# Features
+ZK DAO will be initiated with a starting set of admins (identified by their Aleo account addresses) who can in turn approve or reject members to the DAO. Membership will be provable but not publicly listed.
+In its first iteration, the DAO will allow for submitting proposals, which will be publicly viewable. Proposals can be voted on by members of the DAO at any time prior to the proposal’s voting cutoff timestamp. Member votes will not be publicly listed, but a count of all yes and no votes for a particular proposal will be.
+
+# Tests ran on testnet3
 
 Deployed v0.0.2: https://explorer.aleo.org/program/zkdao_v0_0_2.aleo
 
