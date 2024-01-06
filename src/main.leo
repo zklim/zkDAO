@@ -32,11 +32,11 @@ program zkdao_v0_0_3.aleo {
 
     const MIN_VOTES: field = 3field;
 
-    // prevent double approval from same admin, always store at 0field as global variable
+    // prevent double approval from same admin
     mapping block_double_admin: field => bool;
     // unblock from double approval guard, always store at 0field as global variable
     mapping reset_admin: field => bool;
-    // prevent double approval from same member, always store at 0field as global variable
+    // prevent double approval from same member
     mapping block_double_member: field => bool;
     // unblock from double approval guard, always store at 0field as global variable
     mapping reset_member: field => bool;
