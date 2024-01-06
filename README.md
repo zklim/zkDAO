@@ -11,6 +11,9 @@ ZK DAO aims to add a layer of privacy to the common UX features of a DAO, namely
 ZK DAO will be initiated with a starting set of admins (identified by their Aleo account addresses) who can in turn approve or reject members to the DAO. Membership will be provable but not publicly listed.
 In its first iteration, the DAO will allow for submitting proposals, which will be publicly viewable. Proposals can be voted on by members of the DAO at any time prior to the proposal’s voting cutoff timestamp. Member votes will not be publicly listed, but a count of all yes and no votes for a particular proposal will be.
 
+# Architecture
+![Architecture](images/zkDAO_architecture_1.png)
+
 # Tests ran on testnet3
 
 Deployed v0.0.2: https://explorer.aleo.org/program/zkdao_v0_0_2.aleo
